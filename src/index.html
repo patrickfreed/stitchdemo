@@ -1,0 +1,131 @@
+<html>
+<head>
+  <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.0.8/stitch.js"></script>
+</head>
+
+<body>
+<div id="profile">
+  <div id="profile-user"></div>
+</div>
+<div id="gradesView">
+  <h1>Your Grades</h1>
+  <label for="select-cls">Select a Class</label><select id="select-cls" onchange="setClass()"></select>
+  <button onClick="addDocument()">Hit ME</button>
+  <button onClick="find()">Find ur docs</button>
+  <div id="docs"></div>
+  <div id="assignments">
+    <table id="assignments-table" style="display: table-cell"></table>
+  </div>
+</div>
+
+<script>
+    // Constants
+    const SELECTOR = 'select-cls';
+    const ASSIGNMENTS = 'assignments';
+    const ASSIGNMENTS_TABLE = 'assignments-table';
+    const PROFILE = 'profile';
+    const PROFILE_USER = 'profile-user';
+
+    // Database
+    const client = stitch.Stitch.initializeDefaultAppClient('demo-jvrpx');
+    const db = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas').db('demo');
+    const colClasses = db.collection('classes');
+    const colAssignments = db.collection('assignments');
+    const colStudents = db.collection('students');
+
+    // Models
+    let classes = {};
+    let student = {};
+    let assignments = [];
+    let cls = "MATH101";
+
+    function populateClasses() {
+        return colClasses.find({}).asArray().then(function (docs) {
+            docs.forEach(function (cls) {
+                classes[cls._id] = cls;
+            });
+        });
+    }
+
+    function populateGrades() {
+        return colAssignments.find({class: cls}).asArray().then(function(docs) {
+            assignments = docs;
+        });
+    }
+
+    function populateProfile() {
+        return colStudents.find({}).first().then(function(user) {
+            student = user;
+        });
+    }
+
+    function loadModels() {
+        return Promise.all([
+            populateProfile(),
+            populateClasses(),
+            populateGrades()
+        ])
+    }
+
+    function renderAssignments() {
+        const elAssignments = document.getElementById(ASSIGNMENTS_TABLE);
+
+        elAssignments.innerHTML = "<tr><th>Assignment</th><th>Category</th><th>Date</th><th>Grade</th></tr>"
+        elAssignments.innerHTML += assignments.map(function(assignment) {
+            return (
+                '<tr>' +
+                '<td>' + assignment.title + '</td>' +
+                '<td>' + assignment.category + '</td>' +
+                '<td>' + assignment.date + '</td>' +
+                '<td>' + assignment.grade + '</td>' +
+                '</tr>'
+            );
+        });
+    }
+
+    function renderPage() {
+        const elSelect = document.getElementById(SELECTOR);
+        console.log(SELECTOR);
+        elSelect.innerHTML = Object.keys(classes).map(function(cls_id) {
+            let cls = classes[cls_id];
+            return '<option value="' + cls._id + '">' + cls._id + ': ' + cls.title + '</option>'
+        }).join('');
+
+        const elProfile = document.getElementById(PROFILE_USER);
+        elProfile.innerText = 'Your student id: ' + student._id;
+
+        renderAssignments();
+    }
+
+    function setClass() {
+        cls = document.getElementById(SELECTOR).value;
+        populateGrades().then(renderAssignments);
+    }
+
+    function giveMeBetterGrades() {
+        colAssignments.updateMany({grade: {$lte: 90}}, {$inc: {grade: 10}})
+    }
+
+    client.auth.loginWithCredential(new stitch.AnonymousCredential()).then(
+        function() {
+            loadModels().then(renderPage);
+        }
+    );
+
+    function addDocument() {
+        db.collection('stuff').insertOne({owner_id: client.auth.user.id, dog: 5});
+    }
+
+    function find() {
+        let docsElement = document.getElementById('docs');
+
+        db.collection('classes').find({}).asArray().then(function (docs) {
+            docsElement.innerHTML = docs.map(function (doc) {
+                return JSON.stringify(doc);
+            }).join('<br>');
+        });
+    }
+</script>
+
+</body>
+</html>
