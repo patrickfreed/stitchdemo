@@ -1,4 +1,14 @@
-{
-  "_id": "CMSC131",
-  "title": "Introduction to Object Oriented Programming I"
-}
+[
+  {
+    "_id": "CMSC131",
+    "title": "Introduction to Object Oriented Programming I"
+  },
+  {
+    "_id": "MATH240",
+    "title": "Introduction to Linear Algebra"
+  },
+  {
+    "_id": "CMSC424",
+    "title": "Database Design"
+  }
+]

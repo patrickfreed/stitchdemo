@@ -74,10 +74,10 @@
     let classes = {};
     let student = {};
     let assignments = [];
-    let cls = "MATH101";
+    let cls = "CMSC131";
 
     function giveMeBetterGrades() {
-        colAssignments.updateMany({grade: {$lte: 90}}, {$inc: {grade: 10}}).then(() => populateGrades().then(renderAssignments))
+        colAssignments.updateMany({grade: {$lte: 90}}, {$inc: {grade: 10}}).then(() => populateAssignments().then(renderAssignments))
     }
 
     function populateClasses() {
@@ -88,7 +88,7 @@
         });
     }
 
-    function populateGrades() {
+    function populateAssignments() {
         return colAssignments.find({class: cls}).asArray().then(function (docs) {
             assignments = docs;
         });
@@ -108,7 +108,7 @@
         return Promise.all([
             populateProfile(),
             populateClasses(),
-            populateGrades()
+            populateAssignments()
         ])
     }
 
@@ -143,6 +143,8 @@
     }
 
     function renderAssignments() {
+        if (assignments.length === 0) return;
+
         const elSubtitle = document.getElementById('subtitle');
         elSubtitle.innerText = cls + ': ' + classes[cls].title;
 
@@ -169,17 +171,27 @@
         elAssignments.innerHTML += "</tbody>";
     }
 
-    function renderPage() {
-        if (Object.keys(classes).length === 0) return;
+    function renderProfile() {
+        if (!student._id) return;
+
+        const elProfile = document.getElementById(PROFILE_USER);
+        elProfile.innerText = student._id;
+    }
+
+    function renderSelector() {
+        if (classes.length === 0) return;
 
         const elSelect = document.getElementById(SELECTOR);
         elSelect.innerHTML = Object.keys(classes).map(function (cls_id) {
             let cls = classes[cls_id];
             return '<option value="' + cls._id + '">' + cls._id + ': ' + cls.title + '</option>'
         }).join('');
+    }
 
-        const elProfile = document.getElementById(PROFILE_USER);
-        elProfile.innerText = client.auth.user.id;
+    function renderPage() {
+        renderSelector();
+
+        renderProfile();
 
         renderAlertsButton();
 
@@ -188,7 +200,7 @@
 
     function setClass() {
         cls = document.getElementById(SELECTOR).value;
-        populateGrades().then(renderAssignments);
+        populateAssignments().then(renderAssignments);
     }
 
     function insertGrade() {
@@ -197,7 +209,7 @@
         const title = category + ' #' + Math.floor(Math.random() * 1000.0);
 
         colAssignments.insertOne({_ownerid: client.auth.user.id, class: cls, grade, title, category, date: new Date().toDateString()})
-            .then(() => populateGrades().then(renderAssignments));
+            .then(() => populateAssignments().then(renderAssignments));
     }
 
     client.auth.loginWithCredential(new stitch.AnonymousCredential()).then(

@@ -1,0 +1,46 @@
+0. describe app specificaitons
+  - schema (classes, students, assignments)
+1. atlas demonstration
+  - "build a cluster"
+  - show metrics
+  - connect via shell and populate with a couple classes (see classes.json)
+2. stitch overview
+  - click through getting started areas
+  - mention what rules are
+  - mention what triggers are
+  - mention what services are and what types
+  - show users page
+  - mention values
+  - mention functions
+  - mention logs
+  - mention push notifications
+3. add access rules
+  - classes - anyone can read
+  - assignments - read/write what you own
+     - later show "exploit"
+  - students - read/write what you own (one doc)
+    - _id read only
+4. add authentication trigger for user creation
+  - inserts document into students collection
+5. Open web page
+  - mention areas where need to populate data
+6. fill in populate profile
+  - demo
+7. fill in populate classes
+  - demo
+8. fill in populate grades
+  - demo
+9. add some assignments manually
+  - demo
+10. add add a random grade button
+  - demo
+11. Add "exploit"
+  - demo
+  - fix permissions
+  - demo
+  - undo permissions
+  - demo
+12. Add triggers/alert/twilio integration
+  - demo
+13. add alert clearing
+  - demo
