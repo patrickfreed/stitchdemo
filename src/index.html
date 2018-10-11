@@ -143,7 +143,7 @@
     }
 
     function renderAssignments() {
-        if (assignments.length === 0) return;
+        if (Object.keys(classes).length === 0) return;
 
         const elSubtitle = document.getElementById('subtitle');
         elSubtitle.innerText = cls + ': ' + classes[cls].title;
