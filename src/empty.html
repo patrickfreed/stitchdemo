@@ -1,20 +1,57 @@
 <html>
 <head>
   <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.0.8/stitch.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+          integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+          integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+          crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+          integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+          crossorigin="anonymous"></script>
 </head>
 
 <body>
-<div id="profile">
-  <div id="profile-user"></div>
+<div id="profile" class="container d-flex mb-3 mt-3 p-3 bg-light">
+  <strong>Your student id:</strong>&nbsp;
+  <span id="profile-user"></span>
+  <button class="btn btn-primary ml-auto" id="alerts" type="button" data-toggle="modal"
+          data-target="#alertsModal" onclick="renderAlertsModal()">
+    Alerts <span id="alerts-count" class="badge"></span>
+  </button>
 </div>
-<div id="gradesView">
-  <h1>Your Grades</h1>
-  <label for="select-cls">Select a Class</label><select id="select-cls" onchange="setClass()"></select>
-  <button onClick="addDocument()">Hit ME</button>
-  <button onClick="find()">Find ur docs</button>
-  <div id="docs"></div>
+<div class="container mb-3 p-3 bg-light">
+  <h1 id="title">Your Grades</h1>
+  <h3 id="subtitle"></h3>
+  <label for="select-cls">Select a Class:</label><select id="select-cls" onchange="setClass()" class="form-control"></select>
+  <button class="btn mt-2" onclick="insertGrade()">Add a random grade</button>
+  <button class="btn mt-2" onclick="giveMeBetterGrades()">Give me better grades</button>
+</div>
+
+<div id="gradesView" class="container p-3">
   <div id="assignments">
-    <table id="assignments-table" style="display: table-cell"></table>
+    <table id="assignments-table" class="table table-hover table-bordered table-striped"></table>
+  </div>
+</div>
+
+<div class="modal fade" id="alertsModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">View Alerts</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="clearAlerts()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="clearAlerts()">Close</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -39,28 +76,43 @@
     let assignments = [];
     let cls = "MATH101";
 
-    // TODO: fill in by students
+    // TODO: fix me
+    function giveMeBetterGrades() {
+        // update all grades that aren't A's to be one letter grade higher
+        return new Promise(function (resolve) {
+            resolve('remove me');
+        });
+    }
+
+    // TODO: fix me
     function populateClasses() {
+        // find list of all classes
         return new Promise(function (resolve) {
-            resolve('empty')
+            resolve('remove me');
         });
     }
 
-    // TODO: fill in by students
+    // TODO: fix me
     function populateGrades() {
+        // find assignments associated with current class
         return new Promise(function (resolve) {
-            resolve('empty')
+            resolve('remove me');
         });
     }
 
-    // TODO: fill in by students
+    // TODO: fix me
     function populateProfile() {
+        // find student profile
         return new Promise(function (resolve) {
-            resolve('empty')
+            resolve('remove me');
         });
     }
 
-    // Don't need to modify
+    // TODO: fix me
+    function clearAlerts() {
+        // update alerts array to be empty in student document
+    }
+
     function loadModels() {
         return Promise.all([
             populateProfile(),
@@ -69,33 +121,76 @@
         ])
     }
 
-    // Implemented for them
+    function renderAlertsModal() {
+        if (!student.alerts) return;
+
+        const elModalBody = document.getElementsByClassName('modal-body')[0];
+
+        const getBadge = alertType =>  {
+            const badgeType = alertType === 'NEW GRADE' ? 'badge-primary' : 'badge-secondary';
+            return '<span class="badge ' + badgeType + '">' + alertType + '</span>';
+        };
+
+        elModalBody.innerHTML =
+            '<ul class="list-group">' +
+            student.alerts.map(alert => '<li class="list-group-item">' + getBadge(alert.type) + ' ' + alert.body + '</li>').join('') +
+            '</ul>';
+    }
+
+    function renderAlertsButton() {
+        if (!student.alerts) return;
+
+        const elAlertsCount = document.getElementById('alerts-count');
+
+        elAlertsCount.innerText = student.alerts.length;
+
+        if (student.alerts.length > 0) {
+            elAlertsCount.className = 'badge badge-danger';
+        } else {
+            elAlertsCount.className = 'badge badge-light';
+        }
+    }
+
     function renderAssignments() {
+        const elSubtitle = document.getElementById('subtitle');
+        elSubtitle.innerText = cls + ': ' + classes[cls].title;
+
         const elAssignments = document.getElementById(ASSIGNMENTS_TABLE);
 
-        elAssignments.innerHTML = "<tr><th>Assignment</th><th>Category</th><th>Date</th><th>Grade</th></tr>"
-        elAssignments.innerHTML += assignments.map(function(assignment) {
+        const getBadge = grade => {
+            if (grade >= 90) return '<span class="badge badge-success">A</span>';
+            else if (grade >= 80) return '<span class="badge badge badge-primary">B</span>';
+            else if (grade >= 70) return '<span class="badge badge-warning">C</span>';
+            else return '<span class="badge badge-danger">D</span>'
+        };
+
+        elAssignments.innerHTML = "<thead><tr><th scope='col'>Assignment</th><th scope='col'>Category</th><th scope='col'>Date</th><th scope='col'>Grade</th></tr></thead><tbody>";
+        elAssignments.innerHTML += assignments.map(function (assignment) {
             return (
                 '<tr>' +
                 '<td>' + assignment.title + '</td>' +
                 '<td>' + assignment.category + '</td>' +
                 '<td>' + assignment.date + '</td>' +
-                '<td>' + assignment.grade + '</td>' +
+                '<td>' + getBadge(assignment.grade) + ' ' + assignment.grade + '</td>' +
                 '</tr>'
             );
-        });
+        }).join('');
+        elAssignments.innerHTML += "</tbody>";
     }
 
-    // Implemented for them
     function renderPage() {
+        if (Object.keys(classes).length === 0) return;
+
         const elSelect = document.getElementById(SELECTOR);
-        elSelect.innerHTML = Object.keys(classes).map(function(cls_id) {
+        elSelect.innerHTML = Object.keys(classes).map(function (cls_id) {
             let cls = classes[cls_id];
             return '<option value="' + cls._id + '">' + cls._id + ': ' + cls.title + '</option>'
         }).join('');
 
         const elProfile = document.getElementById(PROFILE_USER);
-        elProfile.innerText = 'Your student id: ' + student._id;
+        elProfile.innerText = client.auth.user.id;
+
+        renderAlertsButton();
 
         renderAssignments();
     }
@@ -105,10 +200,20 @@
         populateGrades().then(renderAssignments);
     }
 
-    // Don't need to modify
+    // TODO: fix me!
+    function insertGrade() {
+        const grade = Math.floor(Math.random() * (100.0 - 55.0)) + 55.0;
+        const category = ['Exam', 'Homework', 'Project'][Math.floor(Math.random() * 3.0)];
+        const title = category + ' #' + Math.floor(Math.random() * 1000.0);
+        const date = new Date().toDateString();
+
+        // fill in insertion here
+    }
+
     client.auth.loginWithCredential(new stitch.AnonymousCredential()).then(
-        function() {
+        function () {
             loadModels().then(renderPage);
+            setInterval(() => populateProfile().then(renderAlertsButton), 1000);
         }
     );
 </script>
