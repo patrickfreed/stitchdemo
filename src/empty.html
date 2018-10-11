@@ -130,7 +130,7 @@
 
         elModalBody.innerHTML =
             '<ul class="list-group">' +
-            student.alerts.map(alert => '<li class="list-group-item">' + getBadge(alert.type) + ' ' + alert.body + '</li>').join('') +
+            student.alerts.slice(0).reverse().map(alert => '<li class="list-group-item">' + getBadge(alert.type) + ' ' + alert.body + '</li>').join('') +
             '</ul>';
     }
 
@@ -160,7 +160,8 @@
             if (grade >= 90) return '<span class="badge badge-success">A</span>';
             else if (grade >= 80) return '<span class="badge badge badge-primary">B</span>';
             else if (grade >= 70) return '<span class="badge badge-warning">C</span>';
-            else return '<span class="badge badge-danger">D</span>'
+            else if (grade >= 60) return '<span class="badge badge-danger">D</span>';
+            else return '<span class="badge badge-danger">F</span>';
         };
 
         elAssignments.innerHTML = "<thead><tr><th scope='col'>Assignment</th><th scope='col'>Category</th><th scope='col'>Date</th><th scope='col'>Grade</th></tr></thead><tbody>";

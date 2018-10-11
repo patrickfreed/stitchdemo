@@ -1,5 +1,8 @@
 {
   "_id": "ObjectId(...) from stitch",
-  "phone": "301-123-1234",
-  "name": "John Doe"
+  "phone": "+13011231234",
+  "alerts": [
+    { "type": "NEW GRADE", "body": "my alert body" },
+    { "type": "GRADE UPDATED", "body": "my alert body" }
+  ]
 }
